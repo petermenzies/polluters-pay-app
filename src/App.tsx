@@ -24,6 +24,10 @@ function App() {
     if (!mapRef.current) return
     const map = mapRef.current.getMap()
     
+    // Close any open popups by removing them from DOM
+    const popups = document.querySelectorAll('.maplibregl-popup')
+    popups.forEach(popup => popup.remove())
+    
     // Hide all layers first
     map.setLayoutProperty('senate-polygon', 'visibility', 'none')
     map.setLayoutProperty('senate-line', 'visibility', 'none')
@@ -73,9 +77,9 @@ function App() {
         .setHTML(`
           <div style="padding: 10px;">
             <h3 style="margin: 0 0 8px 0; color: #3388ff;">${properties.senate_district_label}</h3>
-            <p style="margin: 0;"><strong>County Resolutions:</strong> ${properties.county_resolution_names || 'N/A'}</p>
-            <p style="margin: 0;"><strong>City Resolutions:</strong> ${properties.city_resolution_names || 'N/A'}</p>
-            <p style="margin: 0;"><strong>Walkouts:</strong> ${properties.walkouts || 'N/A'}</p>
+            <p style="margin: 0;"><strong>County Resolutions:</strong> ${properties.county_resolution_names || ' - '}</p>
+            <p style="margin: 0;"><strong>City Resolutions:</strong> ${properties.city_resolution_names || ' - '}</p>
+            <p style="margin: 0;"><strong>Walkouts:</strong> ${properties.walkouts || ' - '}</p>
           </div>
         `)
         .addTo(map)
@@ -84,8 +88,6 @@ function App() {
     map.on('click', 'assembly-polygon', (e: any) => {
       const coordinates = e.lngLat
       const properties = e.features[0].properties
-      
-      // Highlight the clicked feature using a different approach
       
       // change opacity
       map.setPaintProperty('assembly-polygon', 'fill-opacity', [
@@ -100,9 +102,9 @@ function App() {
         .setHTML(`
           <div style="padding: 10px;">
             <h3 style="margin: 0 0 8px 0; color: #8462C0;">${properties.assembly_district_label}</h3>
-            <p style="margin: 0;"><strong>County Resolutions:</strong> ${properties.county_resolution_names || 'N/A'}</p>
-            <p style="margin: 0;"><strong>City Resolutions:</strong> ${properties.city_resolution_names || 'N/A'}</p>
-            <p style="margin: 0;"><strong>Walkouts:</strong> ${properties.walkouts || 'N/A'}</p>
+            <p style="margin: 0;"><strong>County Resolutions:</strong> ${properties.county_resolution_names || ' - '}</p>
+            <p style="margin: 0;"><strong>City Resolutions:</strong> ${properties.city_resolution_names || ' - '}</p>
+            <p style="margin: 0;"><strong>Walkouts:</strong> ${properties.walkouts || ' - '}</p>
           </div>
         `)
         .addTo(map)
