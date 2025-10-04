@@ -1,21 +1,21 @@
 
-import { MapContainer, TileLayer } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
+import Map from 'react-map-gl/maplibre'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import './App.css'
 
 function App() {
   return (
     <div style={{ height: '100vh', width: '100%' }}>
-      <MapContainer
-        center={[34.419, -119.700]}
-        zoom={13}
+      <Map
+        initialViewState={{
+          longitude: -119.700,
+          latitude: 34.419,
+          zoom: 13
+        }}
         style={{ height: '100%', width: '100%' }}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}`}
-        />
-      </MapContainer>
+        mapStyle="https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL"
+        attributionControl={{}}
+      />
     </div>
   )
 }
