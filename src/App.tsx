@@ -30,9 +30,9 @@ function App() {
     map.setLayoutProperty('assembly-polygon', 'visibility', 'none')
     map.setLayoutProperty('assembly-line', 'visibility', 'none')
     
-    // Reset colors to normal
-    map.setPaintProperty('senate-polygon', 'fill-color', '#3388ff')
-    map.setPaintProperty('assembly-polygon', 'fill-color', '#8462C0')
+    // Reset opacity to normal
+    map.setPaintProperty('senate-polygon', 'fill-opacity', 0.5)
+    map.setPaintProperty('assembly-polygon', 'fill-opacity', 0.5)
     
     // Show selected layer
     if (layer === 'senate') {
@@ -60,10 +60,6 @@ function App() {
       const coordinates = e.lngLat
       const properties = e.features[0].properties
       
-      // Clear any existing highlights by changing paint properties
-      map.setPaintProperty('senate-polygon', 'fill-color', '#3388ff')
-      map.setPaintProperty('assembly-polygon', 'fill-color', '#8462C0')
-      
       // change opacity
       map.setPaintProperty('senate-polygon', 'fill-opacity', [
         'case',
@@ -89,10 +85,6 @@ function App() {
       const coordinates = e.lngLat
       const properties = e.features[0].properties
       
-      // Clear any existing highlights by changing paint properties
-      map.setPaintProperty('senate-polygon', 'fill-color', '#3388ff')
-      map.setPaintProperty('assembly-polygon', 'fill-color', '#8462C0')
-      
       // Highlight the clicked feature using a different approach
       
       // change opacity
@@ -117,9 +109,17 @@ function App() {
     })
     
     // Clear highlights when clicking on empty areas
-    map.on('click', () => {
-      map.setPaintProperty('senate-polygon', 'fill-color', '#3388ff')
-      map.setPaintProperty('assembly-polygon', 'fill-color', '#8462C0')
+    map.on('click', (e: any) => {
+      // Query features at the click point
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: ['senate-polygon', 'assembly-polygon']
+      })
+      
+      if (features.length === 0) {
+        // Clicked on no features
+        map.setPaintProperty('senate-polygon', 'fill-opacity', 0.5)
+        map.setPaintProperty('assembly-polygon', 'fill-opacity', 0.5)
+      }
     })
     
     // Change cursor on hover
