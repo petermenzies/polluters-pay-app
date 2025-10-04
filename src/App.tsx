@@ -51,6 +51,58 @@ function App() {
       url: 'pmtiles://https://pub-ab0c00b2b5024563855a23efd20fe62b.r2.dev/districts.pmtiles'
     })
     
+    // Add click handlers for popups
+    map.on('click', 'senate-polygon', (e: any) => {
+      const coordinates = e.lngLat
+      const properties = e.features[0].properties
+      
+      new maplibregl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(`
+          <div style="padding: 10px;">
+            <h3 style="margin: 0 0 8px 0; color: #3388ff;">${properties.senate_district_label}</h3>
+            <p style="margin: 0;"><strong>County Resolutions:</strong> ${properties.county_resolution_names || 'N/A'}</p>
+            <p style="margin: 0;"><strong>City Resolutions:</strong> ${properties.city_resolution_names || 'N/A'}</p>
+            <p style="margin: 0;"><strong>Walkouts:</strong> ${properties.walkouts || 'N/A'}</p>
+          </div>
+        `)
+        .addTo(map)
+    })
+    
+    map.on('click', 'assembly-polygon', (e: any) => {
+      const coordinates = e.lngLat
+      const properties = e.features[0].properties
+      
+      new maplibregl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(`
+          <div style="padding: 10px;">
+            <h3 style="margin: 0 0 8px 0; color: #8462C0;">${properties.assembly_district_label}</h3>
+            <p style="margin: 0;"><strong>County Resolutions:</strong> ${properties.county_resolution_names || 'N/A'}</p>
+            <p style="margin: 0;"><strong>City Resolutions:</strong> ${properties.city_resolution_names || 'N/A'}</p>
+            <p style="margin: 0;"><strong>Walkouts:</strong> ${properties.walkouts || 'N/A'}</p>
+          </div>
+        `)
+        .addTo(map)
+    })
+    
+    // Change cursor on hover
+    map.on('mouseenter', 'senate-polygon', () => {
+      map.getCanvas().style.cursor = 'pointer'
+    })
+    
+    map.on('mouseleave', 'senate-polygon', () => {
+      map.getCanvas().style.cursor = ''
+    })
+    
+    map.on('mouseenter', 'assembly-polygon', () => {
+      map.getCanvas().style.cursor = 'pointer'
+    })
+    
+    map.on('mouseleave', 'assembly-polygon', () => {
+      map.getCanvas().style.cursor = ''
+    })
+    
     // Listen for source data events
     map.on('sourcedata', (e: any) => {
       if (e.sourceId === 'r2-tiles' && e.isSourceLoaded) {
