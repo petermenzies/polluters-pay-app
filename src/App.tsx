@@ -30,6 +30,10 @@ function App() {
     map.setLayoutProperty('assembly-polygon', 'visibility', 'none')
     map.setLayoutProperty('assembly-line', 'visibility', 'none')
     
+    // Reset colors to normal
+    map.setPaintProperty('senate-polygon', 'fill-color', '#3388ff')
+    map.setPaintProperty('assembly-polygon', 'fill-color', '#8462C0')
+    
     // Show selected layer
     if (layer === 'senate') {
       map.setLayoutProperty('senate-polygon', 'visibility', 'visible')
@@ -51,10 +55,22 @@ function App() {
       url: 'pmtiles://https://pub-ab0c00b2b5024563855a23efd20fe62b.r2.dev/districts.pmtiles'
     })
     
-    // Add click handlers for popups
+    // Add click handlers for popups and highlighting
     map.on('click', 'senate-polygon', (e: any) => {
       const coordinates = e.lngLat
       const properties = e.features[0].properties
+      
+      // Clear any existing highlights by changing paint properties
+      map.setPaintProperty('senate-polygon', 'fill-color', '#3388ff')
+      map.setPaintProperty('assembly-polygon', 'fill-color', '#8462C0')
+      
+      // change opacity
+      map.setPaintProperty('senate-polygon', 'fill-opacity', [
+        'case',
+        ['==', ['get', 'senate_district_label'], properties.senate_district_label],
+        0.9,
+        0.5
+      ])
       
       new maplibregl.Popup()
         .setLngLat(coordinates)
@@ -73,6 +89,20 @@ function App() {
       const coordinates = e.lngLat
       const properties = e.features[0].properties
       
+      // Clear any existing highlights by changing paint properties
+      map.setPaintProperty('senate-polygon', 'fill-color', '#3388ff')
+      map.setPaintProperty('assembly-polygon', 'fill-color', '#8462C0')
+      
+      // Highlight the clicked feature using a different approach
+      
+      // change opacity
+      map.setPaintProperty('assembly-polygon', 'fill-opacity', [
+        'case',
+        ['==', ['get', 'assembly_district_label'], properties.assembly_district_label],
+        0.9,
+        0.5
+      ])
+      
       new maplibregl.Popup()
         .setLngLat(coordinates)
         .setHTML(`
@@ -84,6 +114,12 @@ function App() {
           </div>
         `)
         .addTo(map)
+    })
+    
+    // Clear highlights when clicking on empty areas
+    map.on('click', () => {
+      map.setPaintProperty('senate-polygon', 'fill-color', '#3388ff')
+      map.setPaintProperty('assembly-polygon', 'fill-color', '#8462C0')
     })
     
     // Change cursor on hover
