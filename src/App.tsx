@@ -3,10 +3,14 @@ import Map from 'react-map-gl/maplibre'
 import { Protocol } from 'pmtiles'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash, faInfo } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
   const mapRef = useRef<any>(null)
   const [activeLayer, setActiveLayer] = useState<'senate' | 'assembly'>('senate')
+  const [showLabels, setShowLabels] = useState(true)
+  const [infoExpanded, setInfoExpanded] = useState(true)
 
   useEffect(() => {
     // Register the PMTiles protocol once when component mounts
@@ -44,11 +48,29 @@ function App() {
     if (layer === 'senate') {
       map.setLayoutProperty('senate-polygon', 'visibility', 'visible')
       map.setLayoutProperty('senate-line', 'visibility', 'visible')
-      map.setLayoutProperty('senate-points', 'visibility', 'visible')
+      if (showLabels) {
+        map.setLayoutProperty('senate-points', 'visibility', 'visible')
+      }
     } else {
       map.setLayoutProperty('assembly-polygon', 'visibility', 'visible')
       map.setLayoutProperty('assembly-line', 'visibility', 'visible')
-      map.setLayoutProperty('assembly-points', 'visibility', 'visible')
+      if (showLabels) {
+        map.setLayoutProperty('assembly-points', 'visibility', 'visible')
+      }
+    }
+  }
+
+  const toggleLabels = () => {
+    setShowLabels(!showLabels)
+    if (!mapRef.current) return
+    const map = mapRef.current.getMap()
+    
+    const visibility = showLabels ? 'none' : 'visible'
+    
+    if (activeLayer === 'senate') {
+      map.setLayoutProperty('senate-points', 'visibility', visibility)
+    } else {
+      map.setLayoutProperty('assembly-points', 'visibility', visibility)
     }
   }
 
@@ -290,14 +312,14 @@ function App() {
         mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
       />
       
-      {/* Layer Toggle UI */}
+      {/* District Toggle UI */}
       <div style={{
         position: 'absolute',
         top: '20px',
         left: '20px',
         background: 'white',
         color: 'black',
-        padding: '10px',
+        padding: '6px',
         borderRadius: '8px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         zIndex: 1000
@@ -306,7 +328,7 @@ function App() {
           <button
             onClick={() => toggleLayer('senate')}
             style={{
-              padding: '8px 16px',
+              padding: '8px 24px',
               border: '1px solid #ccc',
               borderRadius: '4px',
               background: activeLayer === 'senate' ? '#3388ff' : 'white',
@@ -330,6 +352,113 @@ function App() {
             Assembly
           </button>
         </div>
+      </div>
+
+      {/* Labels Toggle UI */}
+      <div style={{
+        position: 'absolute',
+        top: '80px',
+        left: '20px',
+        background: 'white',
+        color: 'black',
+        padding: '6px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        zIndex: 1000
+      }}>
+        <button
+          onClick={toggleLabels}
+          style={{
+            fontSize: '12px',
+            padding: '8px 10px',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            background: '#F1F1F1',
+            color: 'black',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          <FontAwesomeIcon 
+            icon={showLabels ? faEye : faEyeSlash} 
+            style={{ fontSize: '12px' }}
+          />
+          Labels
+        </button>
+      </div>
+
+      {/* Info Panel */}
+      <div style={{
+        position: 'absolute',
+        bottom: '20px',
+        left: '20px',
+        background: 'white',
+        color: 'black',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        zIndex: 1000,
+        transition: 'all 0.3s ease',
+        overflow: 'hidden'
+      }}>
+        {infoExpanded ? (
+          <div style={{ padding: '15px', minWidth: '300px' }}>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              marginBottom: '10px'
+            }}>
+              <h3 style={{ margin: 0, fontSize: '16px' }}>Welcome!</h3>
+              <button
+                onClick={() => setInfoExpanded(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '18px',
+                  cursor: 'pointer',
+                  padding: '0',
+                  color: '#666'
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
+              <p style={{ margin: '0 0 10px 0' }}>
+                This map shows California legislative districts with information pertaining<br />
+                to the <a href="https://www.makepolluterspayca.com/" target="_blank">Polluters Pay Climate Superfund Act of 2025</a>.
+              </p>
+              <div style={{ margin: '0 0 10px 0' }}>
+                <strong>How to use the map:</strong>
+                <ul>
+                  <li>Click on a district to view detailed information about resolutions and walkouts.</li>
+                  <li>Toggle between Senate and Assembly districts using the buttons in the top left.</li>
+                  <li>Click on the "Labels" button to hide and show the district labels.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setInfoExpanded(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: '10px 12px',
+              cursor: 'pointer',
+              fontSize: '20px',
+              color: '#666'
+            }}
+            title="Show Information"
+          >
+            <FontAwesomeIcon 
+              icon={faInfo} 
+              style={{ fontSize: '20px' }}
+            />
+          </button>
+        )}
       </div>
     </div>
   )
