@@ -152,6 +152,8 @@ function App() {
     map.on('click', 'senate-polygon', (e: any) => {
       const coordinates = e.lngLat
       const properties = e.features[0].properties
+
+      setInfoExpanded(false)
       
       // change opacity
       map.setPaintProperty('senate-polygon', 'fill-opacity', [
@@ -165,10 +167,19 @@ function App() {
         .setLngLat(coordinates)
         .setHTML(`
           <div style="padding: 10px;">
-            <h3 style="margin: 0 0 8px 0; color: #3388ff;">${properties.senate_district_label}</h3>
-            <p style="margin: 0;"><strong>County Resolutions:</strong> ${properties.county_resolution_names || ' - '}</p>
-            <p style="margin: 0;"><strong>City Resolutions:</strong> ${properties.city_resolution_names || ' - '}</p>
-            <p style="margin: 0;"><strong>Walkouts:</strong> ${properties.walkouts || ' - '}</p>
+            <h2 style="margin: 0 0 8px 0; color: #8462C0;">${properties.senate_district_name}</h2>
+            <div style="margin: 0; padding: 6px 8px; background-color: #f8f9fa; border-radius: 4px; margin-bottom: 4px;">
+              <strong>${properties.county_resolutions_passed || ' 0 '} County Resolution(s)</strong><br /> ${properties.county_resolution_names ? properties.county_resolution_names.replaceAll(',', '<br />') : ''}
+            </div>
+            <div style="margin: 0; padding: 6px 8px; background-color: #ffffff; border-radius: 4px; margin-bottom: 4px;">
+              <strong>${properties.city_resolutions_passed || ' 0 '} City Resolution(s)</strong><br /> ${properties.city_resolution_names ? properties.city_resolution_names.replaceAll(',', '<br />') : ''}
+            </div>
+            <div style="margin: 0; padding: 6px 8px; background-color: #f8f9fa; border-radius: 4px; margin-bottom: 4px;">
+              <strong>${properties.letter_authors ? properties.letter_authors.split(',').length : ' 0 '} Individual Letter(s) of Support</strong><br /> ${properties.letter_authors ? properties.letter_authors.replaceAll(',', '<br />') : ''}
+            </div>
+            <div style="margin: 0; padding: 6px 8px; background-color: #ffffff; border-radius: 4px;">
+              <strong>${properties.walkouts ? properties.walkouts.split(',').length : ' 0 '} Walkout(s)</strong><br /> ${properties.walkouts ? properties.walkouts.replaceAll(',', '<br />') : ''}
+            </div>
           </div>
         `)
         .addTo(map)
@@ -177,6 +188,8 @@ function App() {
     map.on('click', 'assembly-polygon', (e: any) => {
       const coordinates = e.lngLat
       const properties = e.features[0].properties
+
+      setInfoExpanded(false)
       
       // change opacity
       map.setPaintProperty('assembly-polygon', 'fill-opacity', [
@@ -190,10 +203,19 @@ function App() {
         .setLngLat(coordinates)
         .setHTML(`
           <div style="padding: 10px;">
-            <h3 style="margin: 0 0 8px 0; color: #8462C0;">${properties.assembly_district_label}</h3>
-            <p style="margin: 0;"><strong>County Resolutions:</strong> ${properties.county_resolution_names || ' - '}</p>
-            <p style="margin: 0;"><strong>City Resolutions:</strong> ${properties.city_resolution_names || ' - '}</p>
-            <p style="margin: 0;"><strong>Walkouts:</strong> ${properties.walkouts || ' - '}</p>
+            <h2 style="margin: 0 0 8px 0; color: #8462C0;">${properties.assembly_district_name}</h2>
+            <div style="margin: 0; padding: 6px 8px; background-color: #f8f9fa; border-radius: 4px; margin-bottom: 4px;">
+              <strong>${properties.county_resolutions_passed || ' 0 '} County Resolution(s)</strong><br /> ${properties.county_resolution_names ? properties.county_resolution_names.replaceAll(',', '<br />') : ''}
+            </div>
+            <div style="margin: 0; padding: 6px 8px; background-color: #ffffff; border-radius: 4px; margin-bottom: 4px;">
+              <strong>${properties.city_resolutions_passed || ' 0 '} City Resolution(s)</strong><br /> ${properties.city_resolution_names ? properties.city_resolution_names.replaceAll(',', '<br />') : ''}
+            </div>
+            <div style="margin: 0; padding: 6px 8px; background-color: #f8f9fa; border-radius: 4px; margin-bottom: 4px;">
+              <strong>${properties.letter_authors ? properties.letter_authors.split(',').length : ' 0 '} Individual Letter(s) of Support</strong><br /> ${properties.letter_authors ? properties.letter_authors.replaceAll(',', '<br />') : ''}
+            </div>
+            <div style="margin: 0; padding: 6px 8px; background-color: #ffffff; border-radius: 4px;">
+              <strong>${properties.walkouts ? properties.walkouts.split(',').length : ' 0 '} Walkout(s)</strong><br /> ${properties.walkouts ? properties.walkouts.replaceAll(',', '<br />') : ''}
+            </div>
           </div>
         `)
         .addTo(map)
@@ -210,6 +232,7 @@ function App() {
         // Clicked on no features
         map.setPaintProperty('senate-polygon', 'fill-opacity', 0.3)
         map.setPaintProperty('assembly-polygon', 'fill-opacity', 0.3)
+        setInfoExpanded(false)
       }
     })
     

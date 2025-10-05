@@ -53,6 +53,10 @@ button:hover {
   color: black;
 }
 
+.maplibregl-popup {
+  max-width: 500px !important;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
