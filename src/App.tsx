@@ -31,20 +31,24 @@ function App() {
     // Hide all layers first
     map.setLayoutProperty('senate-polygon', 'visibility', 'none')
     map.setLayoutProperty('senate-line', 'visibility', 'none')
+    map.setLayoutProperty('senate-points', 'visibility', 'none')
     map.setLayoutProperty('assembly-polygon', 'visibility', 'none')
     map.setLayoutProperty('assembly-line', 'visibility', 'none')
+    map.setLayoutProperty('assembly-points', 'visibility', 'none')
     
     // Reset opacity to normal
-    map.setPaintProperty('senate-polygon', 'fill-opacity', 0.5)
-    map.setPaintProperty('assembly-polygon', 'fill-opacity', 0.5)
+    map.setPaintProperty('senate-polygon', 'fill-opacity', 0.3)
+    map.setPaintProperty('assembly-polygon', 'fill-opacity', 0.3)
     
     // Show selected layer
     if (layer === 'senate') {
       map.setLayoutProperty('senate-polygon', 'visibility', 'visible')
       map.setLayoutProperty('senate-line', 'visibility', 'visible')
+      map.setLayoutProperty('senate-points', 'visibility', 'visible')
     } else {
       map.setLayoutProperty('assembly-polygon', 'visibility', 'visible')
       map.setLayoutProperty('assembly-line', 'visibility', 'visible')
+      map.setLayoutProperty('assembly-points', 'visibility', 'visible')
     }
   }
 
@@ -54,9 +58,72 @@ function App() {
     const map = mapRef.current.getMap()
     
     // Add your PMTiles source from R2 bucket
-    map.addSource('r2-tiles', {
+    map.addSource('district-tiles', {
       type: 'vector',
       url: 'pmtiles://https://pub-ab0c00b2b5024563855a23efd20fe62b.r2.dev/districts.pmtiles'
+    })
+
+    // Load GeoJSON files directly
+    Promise.all([
+      fetch('https://pub-ab0c00b2b5024563855a23efd20fe62b.r2.dev/senate_points.geojson')
+        .then(response => response.json()),
+      fetch('https://pub-ab0c00b2b5024563855a23efd20fe62b.r2.dev/assembly_points.geojson')
+        .then(response => response.json())
+    ]).then(([senateData, assemblyData]) => {
+      // Add sources
+      map.addSource('senate-points', {
+        type: 'geojson',
+        data: senateData
+      })
+      
+      map.addSource('assembly-points', {
+        type: 'geojson',
+        data: assemblyData
+      })
+      
+      // Add layers immediately after sources are added
+      if (!map.getLayer('senate-points')) {
+        map.addLayer({
+          id: 'senate-points',
+          type: 'symbol',
+          source: 'senate-points',
+          layout: {
+            'text-field': ['get', 'senate_district_label'],
+            'text-size': 12,
+            'text-anchor': 'center',
+            'text-allow-overlap': false,
+            'text-ignore-placement': false
+          },
+          paint: {
+            'text-color': '#000000',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 1
+          }
+        })
+      }
+      
+      if (!map.getLayer('assembly-points')) {
+        map.addLayer({
+          id: 'assembly-points',
+          type: 'symbol',
+          source: 'assembly-points',
+          layout: {
+            'text-field': ['get', 'assembly_district_label'],
+            'text-size': 12,
+            'text-anchor': 'center',
+            'text-allow-overlap': false,
+            'text-ignore-placement': false,
+            visibility: 'none'
+          },
+          paint: {
+            'text-color': '#000000',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 1
+          }
+        })
+      }
+    }).catch(error => {
+      console.error('Error loading GeoJSON files:', error)
     })
     
     // Add click handlers for popups and highlighting
@@ -68,8 +135,8 @@ function App() {
       map.setPaintProperty('senate-polygon', 'fill-opacity', [
         'case',
         ['==', ['get', 'senate_district_label'], properties.senate_district_label],
-        0.9,
-        0.5
+        0.6,
+        0.3
       ])
       
       new maplibregl.Popup()
@@ -93,8 +160,8 @@ function App() {
       map.setPaintProperty('assembly-polygon', 'fill-opacity', [
         'case',
         ['==', ['get', 'assembly_district_label'], properties.assembly_district_label],
-        0.9,
-        0.5
+        0.6,
+        0.3
       ])
       
       new maplibregl.Popup()
@@ -119,8 +186,8 @@ function App() {
       
       if (features.length === 0) {
         // Clicked on no features
-        map.setPaintProperty('senate-polygon', 'fill-opacity', 0.5)
-        map.setPaintProperty('assembly-polygon', 'fill-opacity', 0.5)
+        map.setPaintProperty('senate-polygon', 'fill-opacity', 0.3)
+        map.setPaintProperty('assembly-polygon', 'fill-opacity', 0.3)
       }
     })
     
@@ -143,19 +210,19 @@ function App() {
     
     // Listen for source data events
     map.on('sourcedata', (e: any) => {
-      if (e.sourceId === 'r2-tiles' && e.isSourceLoaded) {
+      if (e.sourceId === 'district-tiles' && e.isSourceLoaded) {
         
         // senate layer
         if (!map.getLayer('senate-polygon')) {
           map.addLayer({
             id: 'senate-polygon',
             type: 'fill',
-            source: 'r2-tiles',
+            source: 'district-tiles',
             'source-layer': 'senate',
             layout: { visibility: 'visible' },
             paint: {
               'fill-color': '#3388ff',
-              'fill-opacity': 0.5
+              'fill-opacity': 0.3
             }
           })
         }
@@ -165,27 +232,28 @@ function App() {
           map.addLayer({
             id: 'senate-line',
             type: 'line',
-            source: 'r2-tiles',
+            source: 'district-tiles',
             'source-layer': 'senate',
             layout: { visibility: 'visible' },
             paint: {
-              'line-color': '#000000',
+              'line-color': '#484848',
               'line-width': 1
             }
           })
         }
+
 
         // assembly layer
         if (!map.getLayer('assembly-polygon')) {
           map.addLayer({
             id: 'assembly-polygon',
             type: 'fill',
-            source: 'r2-tiles',
+            source: 'district-tiles',
             'source-layer': 'assembly',
             layout: { visibility: 'none' },
             paint: {
               'fill-color': '#8462C0',
-              'fill-opacity': 0.5
+              'fill-opacity': 0.3
             }
           })
         }
@@ -195,11 +263,11 @@ function App() {
           map.addLayer({
             id: 'assembly-line',
             type: 'line',
-            source: 'r2-tiles',
+            source: 'district-tiles',
             'source-layer': 'assembly',
             layout: { visibility: 'none' },
             paint: {
-              'line-color': '#000000',
+              'line-color': '#484848',
               'line-width': 1
             }
           })
@@ -219,7 +287,7 @@ function App() {
           zoom: 5.25
         }}
         style={{ height: '100%', width: '100%' }}
-        mapStyle="https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL"
+        mapStyle='https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
       />
       
       {/* Layer Toggle UI */}
