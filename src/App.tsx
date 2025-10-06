@@ -642,65 +642,84 @@ function App() {
           position: "absolute",
           bottom: "20px",
           left: "20px",
-          background: "white",
-          color: "black",
-          borderRadius: "8px",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+          background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+          color: "#333",
+          borderRadius: "12px",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1)",
           zIndex: 1000,
           transition: "all 0.3s ease",
           overflow: "hidden",
+          backdropFilter: "blur(10px)",
         }}
       >
         {infoExpanded ? (
-          <div style={{ padding: "15px", minWidth: "300px" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
-            >
-              <h3 style={{ margin: 0, fontSize: "16px" }}>Welcome!</h3>
-              <button
-                onClick={() => setInfoExpanded(false)}
+          <div>
+            <div style={{ 
+              padding: "9px 16px", 
+              background: 'linear-gradient(135deg, #3587FF 0%, #4A9DFF 100%)', 
+              color: "white",
+            }}>
+              <div
                 style={{
-                  background: "none",
-                  border: "none",
-                  fontSize: "18px",
-                  cursor: "pointer",
-                  padding: "0",
-                  color: "#666",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
-                ×
-              </button>
+                <h3 style={{ 
+                  margin: 0, 
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  color: "white",
+                  textShadow: "0 1px 2px rgba(0,0,0,0.1)"
+                }}>Welcome!</h3>
+                <button
+                  onClick={() => setInfoExpanded(false)}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: "20px",
+                    cursor: "pointer",
+                    padding: "0",
+                    color: "white",
+                    opacity: 0.9,
+                  }}
+                >
+                  ×
+                </button>
+              </div>
             </div>
-            <div style={{ fontSize: "14px", lineHeight: "1.5" }}>
-              <p style={{ margin: "0 0 10px 0" }}>
-                This map shows California legislative districts with information
-                pertaining
-                <br />
-                to the{" "}
-                <a href="https://www.makepolluterspayca.com/" target="_blank">
+            <div style={{ padding: "12px 16px", fontSize: "14px", lineHeight: "1.6", minWidth: "300px" }}>
+              <p style={{ margin: "0 0 12px 0", color: "#555" }}>
+                This map shows California legislative districts with information about support for<br /> the{" "}
+                <a 
+                  href="https://www.makepolluterspayca.com/" 
+                  target="_blank"
+                  style={{ 
+                    color: "#3587FF", 
+                    textDecoration: "none",
+                    fontWeight: "600"
+                  }}
+                >
                   Polluters Pay Climate Superfund Act of 2025
-                </a>
-                .
+                </a> in each of those areas.
               </p>
-              <div style={{ margin: "0 0 10px 0" }}>
-                <strong>How to use the map:</strong>
-                <ul>
-                  <li>
-                    Click on a district to view detailed information about
-                    resolutions and walkouts.
+              <div style={{ 
+                padding: "10px 12px",
+                backgroundColor: "rgba(248, 249, 250, 0.6)",
+                borderRadius: "8px",
+                border: "1px solid rgba(0,0,0,0.05)"
+              }}>
+                <strong style={{ color: "#333", fontSize: "13px" }}>How to use the map:</strong>
+                <ul style={{ margin: "6px 0 0 0", paddingLeft: "20px", color: "#666" }}>
+                  <li style={{ marginBottom: "4px" }}>
+                    Click on a district in the map or use the dropdown to view detailed information
+                  </li>
+                  <li style={{ marginBottom: "4px" }}>
+                    Use the buttons in the top left to toggle between Senate and Assembly districts
                   </li>
                   <li>
-                    Toggle between Senate and Assembly districts using the
-                    buttons in the top left.
-                  </li>
-                  <li>
-                    Click on the "Labels" button to hide and show the district
-                    labels.
+                    Darker shaded areas indicate activity in that district
                   </li>
                 </ul>
               </div>
@@ -710,16 +729,21 @@ function App() {
           <button
             onClick={() => setInfoExpanded(true)}
             style={{
-              background: "none",
+              background: "linear-gradient(135deg, #3587FF 0%, #4A9DFF 100%)",
               border: "none",
-              padding: "10px 12px",
+              padding: "12px 14px",
               cursor: "pointer",
               fontSize: "20px",
-              color: "#666",
+              color: "white",
+              borderRadius: "12px",
+              boxShadow: "0 2px 8px rgba(53, 135, 255, 0.3)",
+              transition: "all 0.2s ease",
             }}
             title="Show Information"
+            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
           >
-            <FontAwesomeIcon icon={faInfo} style={{ fontSize: "20px" }} />
+            <FontAwesomeIcon icon={faInfo} style={{ fontSize: "18px" }} />
           </button>
         )}
       </div>
