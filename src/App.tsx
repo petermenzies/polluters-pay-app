@@ -117,47 +117,51 @@ function App() {
           data: assemblyData,
         });
 
-        // Add layers immediately after sources are added
-        if (!map.getLayer("senate-points")) {
-          map.addLayer({
-            id: "senate-points",
-            type: "symbol",
-            source: "senate-points",
-            layout: {
-              "text-field": ["get", "senate_district_label"],
-              "text-size": 12,
-              "text-anchor": "center",
-              "text-allow-overlap": false,
-              "text-ignore-placement": false,
-            },
-            paint: {
-              "text-color": "#000000",
-              "text-halo-color": "#ffffff",
-              "text-halo-width": 1,
-            },
-          });
-        }
+        // Wait for map to be idle before adding text layers to ensure halos render correctly
+        map.once("idle", () => {
+          if (!map.getLayer("senate-points")) {
+            map.addLayer({
+              id: "senate-points",
+              type: "symbol",
+              source: "senate-points",
+              layout: {
+                "text-field": ["get", "senate_district_label"],
+                "text-size": 12,
+                "text-anchor": "center",
+                "text-allow-overlap": false,
+                "text-ignore-placement": false,
+              },
+              paint: {
+                "text-color": "#000000",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 2,
+                "text-halo-blur": 1,
+              },
+            });
+          }
 
-        if (!map.getLayer("assembly-points")) {
-          map.addLayer({
-            id: "assembly-points",
-            type: "symbol",
-            source: "assembly-points",
-            layout: {
-              "text-field": ["get", "assembly_district_label"],
-              "text-size": 12,
-              "text-anchor": "center",
-              "text-allow-overlap": false,
-              "text-ignore-placement": false,
-              visibility: "none",
-            },
-            paint: {
-              "text-color": "#000000",
-              "text-halo-color": "#ffffff",
-              "text-halo-width": 1,
-            },
-          });
-        }
+          if (!map.getLayer("assembly-points")) {
+            map.addLayer({
+              id: "assembly-points",
+              type: "symbol",
+              source: "assembly-points",
+              layout: {
+                "text-field": ["get", "assembly_district_label"],
+                "text-size": 12,
+                "text-anchor": "center",
+                "text-allow-overlap": false,
+                "text-ignore-placement": false,
+                visibility: "none",
+              },
+              paint: {
+                "text-color": "#000000",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 2,
+                "text-halo-blur": 1,
+              },
+            });
+          }
+        });
       })
       .catch((error) => {
         console.error("Error loading GeoJSON files:", error);
@@ -215,7 +219,7 @@ function App() {
         
         if (properties.letter_authors) {
           attributes.push({
-            label: `${properties.letter_authors.split(",").length} Individual Letter(s) of Support`,
+            label: `${properties.letter_authors.split(",").length} Local Elected Sign-On`,
             content: properties.letter_authors.replaceAll(",", "<br />")
           });
         }
@@ -297,7 +301,7 @@ function App() {
         
         if (properties.letter_authors) {
           attributes.push({
-            label: `${properties.letter_authors.split(",").length} Individual Letter(s) of Support`,
+            label: `${properties.letter_authors.split(",").length} Local Elected Sign-On`,
             content: properties.letter_authors.replaceAll(",", "<br />")
           });
         }
