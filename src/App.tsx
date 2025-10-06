@@ -187,57 +187,62 @@ function App() {
          ],
        ]);
 
+      // Create popup content based on activity
+      let popupContent = `
+        <div style="padding: 10px;">
+          <h2 style="margin: 0 0 8px 0; color: #3587FF;">${
+            properties.senate_district_name
+          }</h2>
+      `;
+
+      if (properties.activity) {
+        // Only show attributes that have non-null values
+        const attributes = [];
+        
+        if (properties.county_resolution_names) {
+          attributes.push({
+            label: `${properties.county_resolutions_passed || "0"} County Resolution(s)`,
+            content: properties.county_resolution_names.replaceAll(",", "<br />")
+          });
+        }
+        
+        if (properties.city_resolution_names) {
+          attributes.push({
+            label: `${properties.city_resolutions_passed || "0"} City Resolution(s)`,
+            content: properties.city_resolution_names.replaceAll(",", "<br />")
+          });
+        }
+        
+        if (properties.letter_authors) {
+          attributes.push({
+            label: `${properties.letter_authors.split(",").length} Individual Letter(s) of Support`,
+            content: properties.letter_authors.replaceAll(",", "<br />")
+          });
+        }
+        
+        if (properties.walkouts) {
+          attributes.push({
+            label: `${properties.walkouts.split(",").length} Walkout(s)`,
+            content: properties.walkouts.replaceAll(",", "<br />")
+          });
+        }
+
+        // Add alternating background colors
+        attributes.forEach((attr, index) => {
+          const bgColor = index % 2 === 0 ? "#f8f9fa" : "#ffffff";
+          popupContent += `
+            <div style="margin: 0; padding: 6px 8px; background-color: ${bgColor}; border-radius: 4px; margin-bottom: 4px;">
+              <strong>${attr.label}</strong><br />${attr.content}
+            </div>
+          `;
+        });
+      }
+
+      popupContent += `</div>`;
+
       new maplibregl.Popup()
         .setLngLat(coordinates)
-        .setHTML(
-          `
-          <div style="padding: 10px;">
-            <h2 style="margin: 0 0 8px 0; color: #3587FF;">${
-              properties.senate_district_name
-            }</h2>
-            <div style="margin: 0; padding: 6px 8px; background-color: #f8f9fa; border-radius: 4px; margin-bottom: 4px;">
-              <strong>${
-                properties.county_resolutions_passed || " 0 "
-              } County Resolution(s)</strong><br /> ${
-            properties.county_resolution_names
-              ? properties.county_resolution_names.replaceAll(",", "<br />")
-              : ""
-          }
-            </div>
-            <div style="margin: 0; padding: 6px 8px; background-color: #ffffff; border-radius: 4px; margin-bottom: 4px;">
-              <strong>${
-                properties.city_resolutions_passed || " 0 "
-              } City Resolution(s)</strong><br /> ${
-            properties.city_resolution_names
-              ? properties.city_resolution_names.replaceAll(",", "<br />")
-              : ""
-          }
-            </div>
-            <div style="margin: 0; padding: 6px 8px; background-color: #f8f9fa; border-radius: 4px; margin-bottom: 4px;">
-              <strong>${
-                properties.letter_authors
-                  ? properties.letter_authors.split(",").length
-                  : " 0 "
-              } Individual Letter(s) of Support</strong><br /> ${
-            properties.letter_authors
-              ? properties.letter_authors.replaceAll(",", "<br />")
-              : ""
-          }
-            </div>
-            <div style="margin: 0; padding: 6px 8px; background-color: #ffffff; border-radius: 4px;">
-              <strong>${
-                properties.walkouts
-                  ? properties.walkouts.split(",").length
-                  : " 0 "
-              } Walkout(s)</strong><br /> ${
-            properties.walkouts
-              ? properties.walkouts.replaceAll(",", "<br />")
-              : ""
-          }
-            </div>
-          </div>
-        `
-        )
+        .setHTML(popupContent)
         .addTo(map);
     });
 
@@ -264,57 +269,62 @@ function App() {
          ],
        ]);
 
+      // Create popup content based on activity
+      let popupContent = `
+        <div style="padding: 10px;">
+          <h2 style="margin: 0 0 8px 0; color: #8462C0;">${
+            properties.assembly_district_name
+          }</h2>
+      `;
+
+      if (properties.activity) {
+        // Only show attributes that have non-null values
+        const attributes = [];
+        
+        if (properties.county_resolution_names) {
+          attributes.push({
+            label: `${properties.county_resolutions_passed || "0"} County Resolution(s)`,
+            content: properties.county_resolution_names.replaceAll(",", "<br />")
+          });
+        }
+        
+        if (properties.city_resolution_names) {
+          attributes.push({
+            label: `${properties.city_resolutions_passed || "0"} City Resolution(s)`,
+            content: properties.city_resolution_names.replaceAll(",", "<br />")
+          });
+        }
+        
+        if (properties.letter_authors) {
+          attributes.push({
+            label: `${properties.letter_authors.split(",").length} Individual Letter(s) of Support`,
+            content: properties.letter_authors.replaceAll(",", "<br />")
+          });
+        }
+        
+        if (properties.walkouts) {
+          attributes.push({
+            label: `${properties.walkouts.split(",").length} Walkout(s)`,
+            content: properties.walkouts.replaceAll(",", "<br />")
+          });
+        }
+
+        // Add alternating background colors
+        attributes.forEach((attr, index) => {
+          const bgColor = index % 2 === 0 ? "#f8f9fa" : "#ffffff";
+          popupContent += `
+            <div style="margin: 0; padding: 6px 8px; background-color: ${bgColor}; border-radius: 4px; margin-bottom: 4px;">
+              <strong>${attr.label}</strong><br />${attr.content}
+            </div>
+          `;
+        });
+      }
+
+      popupContent += `</div>`;
+
       new maplibregl.Popup()
         .setLngLat(coordinates)
-        .setHTML(
-          `
-          <div style="padding: 10px;">
-            <h2 style="margin: 0 0 8px 0; color: #8462C0;">${
-              properties.assembly_district_name
-            }</h2>
-            <div style="margin: 0; padding: 6px 8px; background-color: #f8f9fa; border-radius: 4px; margin-bottom: 4px;">
-              <strong>${
-                properties.county_resolutions_passed || " 0 "
-              } County Resolution(s)</strong><br /> ${
-            properties.county_resolution_names
-              ? properties.county_resolution_names.replaceAll(",", "<br />")
-              : ""
-          }
-            </div>
-            <div style="margin: 0; padding: 6px 8px; background-color: #ffffff; border-radius: 4px; margin-bottom: 4px;">
-              <strong>${
-                properties.city_resolutions_passed || " 0 "
-              } City Resolution(s)</strong><br /> ${
-            properties.city_resolution_names
-              ? properties.city_resolution_names.replaceAll(",", "<br />")
-              : ""
-          }
-            </div>
-            <div style="margin: 0; padding: 6px 8px; background-color: #f8f9fa; border-radius: 4px; margin-bottom: 4px;">
-              <strong>${
-                properties.letter_authors
-                  ? properties.letter_authors.split(",").length
-                  : " 0 "
-              } Individual Letter(s) of Support</strong><br /> ${
-            properties.letter_authors
-              ? properties.letter_authors.replaceAll(",", "<br />")
-              : ""
-          }
-            </div>
-            <div style="margin: 0; padding: 6px 8px; background-color: #ffffff; border-radius: 4px;">
-              <strong>${
-                properties.walkouts
-                  ? properties.walkouts.split(",").length
-                  : " 0 "
-              } Walkout(s)</strong><br /> ${
-            properties.walkouts
-              ? properties.walkouts.replaceAll(",", "<br />")
-              : ""
-          }
-            </div>
-          </div>
-        `
-        )
+        .setHTML(popupContent)
         .addTo(map);
     });
 
