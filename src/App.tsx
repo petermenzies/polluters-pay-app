@@ -473,31 +473,34 @@ function App() {
           }}>
             {selectedFeature.activity ? (() => {
               const attributes = [];
+              const badgeGradient = selectedFeature.layer === 'senate' 
+                ? 'linear-gradient(135deg, #3587FF, #4A9DFF)'
+                : 'linear-gradient(135deg, #8462C0, #9B7DD4)';
               
               if (selectedFeature.county_resolution_names) {
                 attributes.push({
-                  label: `${selectedFeature.county_resolutions_passed} County Resolution${selectedFeature.county_resolutions_passed === 1 ? "" : "s"}`,
+                  label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${selectedFeature.county_resolutions_passed}</span>County Resolution${selectedFeature.county_resolutions_passed === 1 ? "" : "s"}`,
                   content: selectedFeature.county_resolution_names.replaceAll(",", "<br />")
                 });
               }
               
               if (selectedFeature.city_resolution_names) {
                 attributes.push({
-                  label: `${selectedFeature.city_resolutions_passed} City Resolution${selectedFeature.city_resolutions_passed === 1 ? "" : "s"}`,
+                  label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${selectedFeature.city_resolutions_passed}</span>City Resolution${selectedFeature.city_resolutions_passed === 1 ? "" : "s"}`,
                   content: selectedFeature.city_resolution_names.replaceAll(",", "<br />")
                 });
               }
               
               if (selectedFeature.letter_authors) {
                 attributes.push({
-                  label: `${selectedFeature.number_of_letters} Local Elected Sign-On${selectedFeature.number_of_letters === 1 ? "" : "s"}`,
+                  label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${selectedFeature.number_of_letters}</span>Local Elected Sign-On${selectedFeature.number_of_letters === 1 ? "" : "s"}`,
                   content: selectedFeature.letter_authors.replaceAll(",", "<br />")
                 });
               }
               
               if (selectedFeature.walkouts) {
                 attributes.push({
-                  label: `${selectedFeature.number_of_walkouts} Student Walkout${selectedFeature.number_of_walkouts === 1 ? "" : "s"}`,
+                  label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${selectedFeature.number_of_walkouts}</span>Student Walkout${selectedFeature.number_of_walkouts === 1 ? "" : "s"}`,
                   content: selectedFeature.walkouts.replaceAll(",", "<br />")
                 });
               }
