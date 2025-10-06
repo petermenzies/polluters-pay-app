@@ -435,20 +435,42 @@ function App() {
             position: "absolute",
             top: "20px",
             right: "20px",
-            background: "white",
-            color: "black",
-            borderRadius: "8px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)",
+            color: "#333",
+            borderRadius: "12px",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1)",
             zIndex: 1000,
             width: "400px",
+            overflow: "hidden",
+            backdropFilter: "blur(10px)",
           }}
         >
-          <div style={{ padding: "10px", fontSize: "14px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <h2 style={{ margin: 0, fontSize: "18px", color: selectedFeature.layer === 'senate' ? '#3587FF' : '#8462C0' }}>
+          <div style={{ 
+            padding: "12px 16px", 
+            fontSize: "12px",
+            background: selectedFeature.layer === 'senate' 
+              ? 'linear-gradient(135deg, #3587FF 0%, #4A9DFF 100%)' 
+              : 'linear-gradient(135deg, #8462C0 0%, #9B7DD4 100%)',
+            color: "white",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ 
+                margin: 0, 
+                fontSize: "18px", 
+                fontWeight: "600",
+                color: "white",
+                textShadow: "0 1px 2px rgba(0,0,0,0.1)"
+              }}>
                 {selectedFeature.layer === 'senate' ? selectedFeature.senate_district_name : selectedFeature.assembly_district_name}
               </h2>
             </div>
+          </div>
+          <div style={{ 
+            padding: "12px 12px", 
+            fontSize: "14px",
+            maxHeight: "82.5vh",
+            overflowY: "auto"
+          }}>
             {selectedFeature.activity ? (() => {
               const attributes = [];
               
@@ -481,19 +503,22 @@ function App() {
               }
 
               return attributes.map((attr, index) => {
-                const bgColor = index % 2 === 0 ? "#f8f9fa" : "#ffffff";
+                const bgColor = index % 2 === 0 ? "rgba(248, 249, 250, 0.6)" : "rgba(255, 255, 255, 0.8)";
                 return (
                   <div 
                     key={index}
                     style={{
                       margin: 0,
-                      padding: "6px 8px",
+                      padding: "8px 10px",
                       backgroundColor: bgColor,
-                      borderRadius: "4px",
-                      marginBottom: "4px"
+                      borderRadius: "8px",
+                      marginBottom: "6px",
+                      border: "1px solid rgba(0,0,0,0.05)",
+                      transition: "all 0.2s ease",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
                     }}
                     dangerouslySetInnerHTML={{
-                      __html: `<strong>${attr.label}</strong><br />${attr.content}`
+                      __html: `<strong style="color: #444; font-weight: 600;">${attr.label}</strong><ul style="margin: 4px 0 0 0; padding-left: 20px;"><li style="color: #666; line-height: 1.5;">${attr.content.replaceAll("<br />", "</li><li style='color: #666; line-height: 1.5;'>")}</li></ul>`
                     }}
                   />
                 );
@@ -501,12 +526,14 @@ function App() {
             })() : (
               <div style={{
                 margin: 0,
-                padding: "6px 8px",
-                backgroundColor: "#f8f9fa",
-                borderRadius: "4px",
-                marginBottom: "4px"
+                padding: "8px 10px",
+                backgroundColor: "rgba(248, 249, 250, 0.6)",
+                borderRadius: "8px",
+                border: "1px solid rgba(0,0,0,0.05)",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                textAlign: "center"
               }}>
-                <i>No activity reported yet</i>
+                <i style={{ color: "#999", fontSize: "13px" }}>No activity reported yet</i>
               </div>
             )}
           </div>
