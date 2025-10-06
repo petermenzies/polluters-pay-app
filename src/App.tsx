@@ -440,42 +440,42 @@ function App() {
             borderRadius: "8px",
             boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
             zIndex: 1000,
-            maxWidth: "400px",
+            width: "400px",
           }}
         >
           <div style={{ padding: "10px", fontSize: "14px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <h2 style={{ margin: 0, fontSize: "16px", color: selectedFeature.layer === 'senate' ? '#3587FF' : '#8462C0' }}>
+              <h2 style={{ margin: 0, fontSize: "18px", color: selectedFeature.layer === 'senate' ? '#3587FF' : '#8462C0' }}>
                 {selectedFeature.layer === 'senate' ? selectedFeature.senate_district_name : selectedFeature.assembly_district_name}
               </h2>
             </div>
-            {selectedFeature.activity && (() => {
+            {selectedFeature.activity ? (() => {
               const attributes = [];
               
               if (selectedFeature.county_resolution_names) {
                 attributes.push({
-                  label: `${selectedFeature.county_resolutions_passed || "0"} County Resolution(s)`,
+                  label: `${selectedFeature.county_resolutions_passed} County Resolution${selectedFeature.county_resolutions_passed === 1 ? "" : "s"}`,
                   content: selectedFeature.county_resolution_names.replaceAll(",", "<br />")
                 });
               }
               
               if (selectedFeature.city_resolution_names) {
                 attributes.push({
-                  label: `${selectedFeature.city_resolutions_passed || "0"} City Resolution(s)`,
+                  label: `${selectedFeature.city_resolutions_passed} City Resolution${selectedFeature.city_resolutions_passed === 1 ? "" : "s"}`,
                   content: selectedFeature.city_resolution_names.replaceAll(",", "<br />")
                 });
               }
               
               if (selectedFeature.letter_authors) {
                 attributes.push({
-                  label: `${selectedFeature.letter_authors.split(",").length} Local Elected Sign-On`,
+                  label: `${selectedFeature.number_of_letters} Local Elected Sign-On${selectedFeature.number_of_letters === 1 ? "" : "s"}`,
                   content: selectedFeature.letter_authors.replaceAll(",", "<br />")
                 });
               }
               
               if (selectedFeature.walkouts) {
                 attributes.push({
-                  label: `${selectedFeature.walkouts.split(",").length} Walkout(s)`,
+                  label: `${selectedFeature.number_of_walkouts} Student Walkout${selectedFeature.number_of_walkouts === 1 ? "" : "s"}`,
                   content: selectedFeature.walkouts.replaceAll(",", "<br />")
                 });
               }
@@ -498,7 +498,17 @@ function App() {
                   />
                 );
               });
-            })()}
+            })() : (
+              <div style={{
+                margin: 0,
+                padding: "6px 8px",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "4px",
+                marginBottom: "4px"
+              }}>
+                <i>No activity reported yet</i>
+              </div>
+            )}
           </div>
         </div>
       )}
