@@ -14,6 +14,7 @@ function App() {
   const [showLabels, setShowLabels] = useState(true);
   const [infoExpanded, setInfoExpanded] = useState(true);
   const [selectedFeature, setSelectedFeature] = useState<any>(null);
+  const [districtData, setDistrictData] = useState<any>({ senate: [], assembly: [] });
 
   useEffect(() => {
     // Register the PMTiles protocol once when component mounts
@@ -81,6 +82,40 @@ function App() {
       map.setLayoutProperty("senate-points", "visibility", visibility);
     } else {
       map.setLayoutProperty("assembly-points", "visibility", visibility);
+    }
+  };
+
+  const selectDistrictFromDropdown = (districtLabel: string) => {
+    if (!mapRef.current || !districtLabel) return;
+    const map = mapRef.current.getMap();
+
+    const sourceLayer = activeLayer === "senate" ? "senate" : "assembly";
+    const labelField = activeLayer === "senate" ? "senate_district_label" : "assembly_district_label";
+    
+    // Query features from the map
+    const features = map.querySourceFeatures("district-tiles", {
+      sourceLayer: sourceLayer,
+      filter: ["==", labelField, districtLabel]
+    });
+
+    if (features.length > 0) {
+      const properties = features[0].properties;
+      setInfoExpanded(false);
+      setSelectedFeature({ ...properties, layer: activeLayer });
+
+      // Highlight the selected feature
+      const polygonLayer = activeLayer === "senate" ? "senate-polygon" : "assembly-polygon";
+      map.setPaintProperty(polygonLayer, "fill-opacity", [
+        "case",
+        ["==", ["get", labelField], districtLabel],
+        0.6,
+        [
+          "case",
+          ["get", "activity"],
+          0.3,
+          0.2
+        ],
+      ]);
     }
   };
 
@@ -260,6 +295,26 @@ function App() {
     // Listen for source data events
     map.on("sourcedata", (e: any) => {
       if (e.sourceId === "district-tiles" && e.isSourceLoaded) {
+        // Populate district dropdown data
+        const senateFeatures = map.querySourceFeatures("district-tiles", {
+          sourceLayer: "senate"
+        });
+        const assemblyFeatures = map.querySourceFeatures("district-tiles", {
+          sourceLayer: "assembly"
+        });
+
+        const senateDistricts = senateFeatures
+          .map((f: any) => f.properties.senate_district_label)
+          .filter((label: string, index: number, self: string[]) => label && self.indexOf(label) === index)
+          .sort();
+
+        const assemblyDistricts = assemblyFeatures
+          .map((f: any) => f.properties.assembly_district_label)
+          .filter((label: string, index: number, self: string[]) => label && self.indexOf(label) === index)
+          .sort();
+
+        setDistrictData({ senate: senateDistricts, assembly: assemblyDistricts });
+
         // senate layer
         if (!map.getLayer("senate-polygon")) {
           map.addLayer({
@@ -391,11 +446,49 @@ function App() {
         </div>
       </div>
 
-      {/* Labels Toggle UI */}
+      {/* District Dropdown */}
       <div
         style={{
           position: "absolute",
           top: "80px",
+          left: "20px",
+          background: "white",
+          color: "black",
+          padding: "6px",
+          borderRadius: "8px",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+          zIndex: 1000,
+        }}
+      >
+        <select
+          value={selectedFeature ? (activeLayer === 'senate' ? selectedFeature.senate_district_label : selectedFeature.assembly_district_label) : ""}
+          onChange={(e) => selectDistrictFromDropdown(e.target.value)}
+          style={{
+            fontSize: "12px",
+            fontWeight: "600",
+            padding: "8px 10px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            background: "white",
+            color: "black",
+            cursor: "pointer",
+            minWidth: "150px",
+          }}
+        >
+          <option value="">Select District</option>
+          {(activeLayer === 'senate' ? districtData.senate : districtData.assembly).map((district: string) => (
+            <option key={district} value={district}>
+              {district}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Labels Toggle UI */}
+      <div
+        style={{
+          position: "absolute",
+          top: "140px",
           left: "20px",
           background: "white",
           color: "black",
