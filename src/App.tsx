@@ -13,6 +13,7 @@ function App() {
   );
   const [showLabels, setShowLabels] = useState(true);
   const [infoExpanded, setInfoExpanded] = useState(true);
+  const [selectedFeature, setSelectedFeature] = useState<any>(null);
 
   useEffect(() => {
     // Register the PMTiles protocol once when component mounts
@@ -27,12 +28,9 @@ function App() {
 
   const toggleLayer = (layer: "senate" | "assembly") => {
     setActiveLayer(layer);
+    setSelectedFeature(null);
     if (!mapRef.current) return;
     const map = mapRef.current.getMap();
-
-    // Close any open popups by removing them from DOM
-    const popups = document.querySelectorAll(".maplibregl-popup");
-    popups.forEach((popup) => popup.remove());
 
     // Hide all layers first
     map.setLayoutProperty("senate-polygon", "visibility", "none");
@@ -167,169 +165,53 @@ function App() {
         console.error("Error loading GeoJSON files:", error);
       });
 
-    // Add click handlers for popups and highlighting
+    // Add click handlers for feature selection and highlighting
     map.on("click", "senate-polygon", (e: any) => {
-      const coordinates = e.lngLat;
       const properties = e.features[0].properties;
 
       setInfoExpanded(false);
+      setSelectedFeature({ ...properties, layer: 'senate' });
 
-       // change opacity
-       map.setPaintProperty("senate-polygon", "fill-opacity", [
-         "case",
-         [
-           "==",
-           ["get", "senate_district_label"],
-           properties.senate_district_label,
-         ],
-         0.6,
-         [
-           "case",
-           ["get", "activity"],
-           0.3,
-           0.2
-         ],
-       ]);
-
-      // Create popup content based on activity
-      let popupContent = `
-        <div style="padding: 10px;">
-          <h2 style="margin: 0 0 8px 0; color: #3587FF;">${
-            properties.senate_district_name
-          }</h2>
-      `;
-
-      if (properties.activity) {
-        // Only show attributes that have non-null values
-        const attributes = [];
-        
-        if (properties.county_resolution_names) {
-          attributes.push({
-            label: `${properties.county_resolutions_passed || "0"} County Resolution(s)`,
-            content: properties.county_resolution_names.replaceAll(",", "<br />")
-          });
-        }
-        
-        if (properties.city_resolution_names) {
-          attributes.push({
-            label: `${properties.city_resolutions_passed || "0"} City Resolution(s)`,
-            content: properties.city_resolution_names.replaceAll(",", "<br />")
-          });
-        }
-        
-        if (properties.letter_authors) {
-          attributes.push({
-            label: `${properties.letter_authors.split(",").length} Local Elected Sign-On`,
-            content: properties.letter_authors.replaceAll(",", "<br />")
-          });
-        }
-        
-        if (properties.walkouts) {
-          attributes.push({
-            label: `${properties.walkouts.split(",").length} Walkout(s)`,
-            content: properties.walkouts.replaceAll(",", "<br />")
-          });
-        }
-
-        // Add alternating background colors
-        attributes.forEach((attr, index) => {
-          const bgColor = index % 2 === 0 ? "#f8f9fa" : "#ffffff";
-          popupContent += `
-            <div style="margin: 0; padding: 6px 8px; background-color: ${bgColor}; border-radius: 4px; margin-bottom: 4px;">
-              <strong>${attr.label}</strong><br />${attr.content}
-            </div>
-          `;
-        });
-      }
-
-      popupContent += `</div>`;
-
-      new maplibregl.Popup()
-        .setLngLat(coordinates)
-        .setHTML(popupContent)
-        .addTo(map);
+      // change opacity
+      map.setPaintProperty("senate-polygon", "fill-opacity", [
+        "case",
+        [
+          "==",
+          ["get", "senate_district_label"],
+          properties.senate_district_label,
+        ],
+        0.6,
+        [
+          "case",
+          ["get", "activity"],
+          0.3,
+          0.2
+        ],
+      ]);
     });
 
     map.on("click", "assembly-polygon", (e: any) => {
-      const coordinates = e.lngLat;
       const properties = e.features[0].properties;
 
       setInfoExpanded(false);
+      setSelectedFeature({ ...properties, layer: 'assembly' });
 
-       // change opacity
-       map.setPaintProperty("assembly-polygon", "fill-opacity", [
-         "case",
-         [
-           "==",
-           ["get", "assembly_district_label"],
-           properties.assembly_district_label,
-         ],
-         0.6,
-         [
-           "case",
-           ["get", "activity"],
-           0.3,
-           0.2
-         ],
-       ]);
-
-      // Create popup content based on activity
-      let popupContent = `
-        <div style="padding: 10px;">
-          <h2 style="margin: 0 0 8px 0; color: #8462C0;">${
-            properties.assembly_district_name
-          }</h2>
-      `;
-
-      if (properties.activity) {
-        // Only show attributes that have non-null values
-        const attributes = [];
-        
-        if (properties.county_resolution_names) {
-          attributes.push({
-            label: `${properties.county_resolutions_passed || "0"} County Resolution(s)`,
-            content: properties.county_resolution_names.replaceAll(",", "<br />")
-          });
-        }
-        
-        if (properties.city_resolution_names) {
-          attributes.push({
-            label: `${properties.city_resolutions_passed || "0"} City Resolution(s)`,
-            content: properties.city_resolution_names.replaceAll(",", "<br />")
-          });
-        }
-        
-        if (properties.letter_authors) {
-          attributes.push({
-            label: `${properties.letter_authors.split(",").length} Local Elected Sign-On`,
-            content: properties.letter_authors.replaceAll(",", "<br />")
-          });
-        }
-        
-        if (properties.walkouts) {
-          attributes.push({
-            label: `${properties.walkouts.split(",").length} Walkout(s)`,
-            content: properties.walkouts.replaceAll(",", "<br />")
-          });
-        }
-
-        // Add alternating background colors
-        attributes.forEach((attr, index) => {
-          const bgColor = index % 2 === 0 ? "#f8f9fa" : "#ffffff";
-          popupContent += `
-            <div style="margin: 0; padding: 6px 8px; background-color: ${bgColor}; border-radius: 4px; margin-bottom: 4px;">
-              <strong>${attr.label}</strong><br />${attr.content}
-            </div>
-          `;
-        });
-      }
-
-      popupContent += `</div>`;
-
-      new maplibregl.Popup()
-        .setLngLat(coordinates)
-        .setHTML(popupContent)
-        .addTo(map);
+      // change opacity
+      map.setPaintProperty("assembly-polygon", "fill-opacity", [
+        "case",
+        [
+          "==",
+          ["get", "assembly_district_label"],
+          properties.assembly_district_label,
+        ],
+        0.6,
+        [
+          "case",
+          ["get", "activity"],
+          0.3,
+          0.2
+        ],
+      ]);
     });
 
     // Clear highlights when clicking on empty areas
@@ -339,22 +221,23 @@ function App() {
         layers: ["senate-polygon", "assembly-polygon"],
       });
 
-       if (features.length === 0) {
-         // Clicked on no features
-         map.setPaintProperty("senate-polygon", "fill-opacity", [
-           "case",
-           ["get", "activity"],
-           0.3,
-           0.2
-         ]);
-         map.setPaintProperty("assembly-polygon", "fill-opacity", [
-           "case",
-           ["get", "activity"],
-           0.3,
-           0.2
-         ]);
-         setInfoExpanded(false);
-       }
+      if (features.length === 0) {
+        // Clicked on no features
+        map.setPaintProperty("senate-polygon", "fill-opacity", [
+          "case",
+          ["get", "activity"],
+          0.3,
+          0.2
+        ]);
+        map.setPaintProperty("assembly-polygon", "fill-opacity", [
+          "case",
+          ["get", "activity"],
+          0.3,
+          0.2
+        ]);
+        setInfoExpanded(false);
+        setSelectedFeature(null);
+      }
     });
 
     // Change cursor on hover
@@ -544,6 +427,81 @@ function App() {
           Labels
         </button>
       </div>
+
+      {/* Feature Detail Panel */}
+      {selectedFeature && (
+        <div
+          style={{
+            position: "absolute",
+            top: "20px",
+            right: "20px",
+            background: "white",
+            color: "black",
+            borderRadius: "8px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+            zIndex: 1000,
+            maxWidth: "400px",
+          }}
+        >
+          <div style={{ padding: "10px", fontSize: "14px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <h2 style={{ margin: 0, fontSize: "16px", color: selectedFeature.layer === 'senate' ? '#3587FF' : '#8462C0' }}>
+                {selectedFeature.layer === 'senate' ? selectedFeature.senate_district_name : selectedFeature.assembly_district_name}
+              </h2>
+            </div>
+            {selectedFeature.activity && (() => {
+              const attributes = [];
+              
+              if (selectedFeature.county_resolution_names) {
+                attributes.push({
+                  label: `${selectedFeature.county_resolutions_passed || "0"} County Resolution(s)`,
+                  content: selectedFeature.county_resolution_names.replaceAll(",", "<br />")
+                });
+              }
+              
+              if (selectedFeature.city_resolution_names) {
+                attributes.push({
+                  label: `${selectedFeature.city_resolutions_passed || "0"} City Resolution(s)`,
+                  content: selectedFeature.city_resolution_names.replaceAll(",", "<br />")
+                });
+              }
+              
+              if (selectedFeature.letter_authors) {
+                attributes.push({
+                  label: `${selectedFeature.letter_authors.split(",").length} Local Elected Sign-On`,
+                  content: selectedFeature.letter_authors.replaceAll(",", "<br />")
+                });
+              }
+              
+              if (selectedFeature.walkouts) {
+                attributes.push({
+                  label: `${selectedFeature.walkouts.split(",").length} Walkout(s)`,
+                  content: selectedFeature.walkouts.replaceAll(",", "<br />")
+                });
+              }
+
+              return attributes.map((attr, index) => {
+                const bgColor = index % 2 === 0 ? "#f8f9fa" : "#ffffff";
+                return (
+                  <div 
+                    key={index}
+                    style={{
+                      margin: 0,
+                      padding: "6px 8px",
+                      backgroundColor: bgColor,
+                      borderRadius: "4px",
+                      marginBottom: "4px"
+                    }}
+                    dangerouslySetInnerHTML={{
+                      __html: `<strong>${attr.label}</strong><br />${attr.content}`
+                    }}
+                  />
+                );
+              });
+            })()}
+          </div>
+        </div>
+      )}
 
       {/* Info Panel */}
       <div
