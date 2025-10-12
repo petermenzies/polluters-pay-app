@@ -14,7 +14,10 @@ function App() {
   const [showLabels, setShowLabels] = useState(true);
   const [infoExpanded, setInfoExpanded] = useState(true);
   const [selectedFeature, setSelectedFeature] = useState<any>(null);
-  const [districtData, setDistrictData] = useState<any>({ senate: [], assembly: [] });
+  const [districtData, setDistrictData] = useState<any>({
+    senate: [],
+    assembly: [],
+  });
 
   useEffect(() => {
     // Register the PMTiles protocol once when component mounts
@@ -41,19 +44,19 @@ function App() {
     map.setLayoutProperty("assembly-line", "visibility", "none");
     map.setLayoutProperty("assembly-points", "visibility", "none");
 
-     // Reset opacity to normal
-     map.setPaintProperty("senate-polygon", "fill-opacity", [
-       "case",
-       ["get", "activity"],
-       0.3,
-       0.2
-     ]);
-     map.setPaintProperty("assembly-polygon", "fill-opacity", [
-       "case",
-       ["get", "activity"],
-       0.3,
-       0.2
-     ]);
+    // Reset opacity to normal
+    map.setPaintProperty("senate-polygon", "fill-opacity", [
+      "case",
+      ["get", "activity"],
+      0.3,
+      0.2,
+    ]);
+    map.setPaintProperty("assembly-polygon", "fill-opacity", [
+      "case",
+      ["get", "activity"],
+      0.3,
+      0.2,
+    ]);
 
     // Show selected layer
     if (layer === "senate") {
@@ -90,12 +93,15 @@ function App() {
     const map = mapRef.current.getMap();
 
     const sourceLayer = activeLayer === "senate" ? "senate" : "assembly";
-    const labelField = activeLayer === "senate" ? "senate_district_label" : "assembly_district_label";
-    
+    const labelField =
+      activeLayer === "senate"
+        ? "senate_district_label"
+        : "assembly_district_label";
+
     // Query features from the map
     const features = map.querySourceFeatures("district-tiles", {
       sourceLayer: sourceLayer,
-      filter: ["==", labelField, districtLabel]
+      filter: ["==", labelField, districtLabel],
     });
 
     if (features.length > 0) {
@@ -104,17 +110,13 @@ function App() {
       setSelectedFeature({ ...properties, layer: activeLayer });
 
       // Highlight the selected feature
-      const polygonLayer = activeLayer === "senate" ? "senate-polygon" : "assembly-polygon";
+      const polygonLayer =
+        activeLayer === "senate" ? "senate-polygon" : "assembly-polygon";
       map.setPaintProperty(polygonLayer, "fill-opacity", [
         "case",
         ["==", ["get", labelField], districtLabel],
         0.6,
-        [
-          "case",
-          ["get", "activity"],
-          0.3,
-          0.2
-        ],
+        ["case", ["get", "activity"], 0.3, 0.2],
       ]);
     }
   };
@@ -205,7 +207,7 @@ function App() {
       const properties = e.features[0].properties;
 
       setInfoExpanded(false);
-      setSelectedFeature({ ...properties, layer: 'senate' });
+      setSelectedFeature({ ...properties, layer: "senate" });
 
       // change opacity
       map.setPaintProperty("senate-polygon", "fill-opacity", [
@@ -216,12 +218,7 @@ function App() {
           properties.senate_district_label,
         ],
         0.6,
-        [
-          "case",
-          ["get", "activity"],
-          0.3,
-          0.2
-        ],
+        ["case", ["get", "activity"], 0.3, 0.2],
       ]);
     });
 
@@ -229,7 +226,7 @@ function App() {
       const properties = e.features[0].properties;
 
       setInfoExpanded(false);
-      setSelectedFeature({ ...properties, layer: 'assembly' });
+      setSelectedFeature({ ...properties, layer: "assembly" });
 
       // change opacity
       map.setPaintProperty("assembly-polygon", "fill-opacity", [
@@ -240,12 +237,7 @@ function App() {
           properties.assembly_district_label,
         ],
         0.6,
-        [
-          "case",
-          ["get", "activity"],
-          0.3,
-          0.2
-        ],
+        ["case", ["get", "activity"], 0.3, 0.2],
       ]);
     });
 
@@ -262,13 +254,13 @@ function App() {
           "case",
           ["get", "activity"],
           0.3,
-          0.2
+          0.2,
         ]);
         map.setPaintProperty("assembly-polygon", "fill-opacity", [
           "case",
           ["get", "activity"],
           0.3,
-          0.2
+          0.2,
         ]);
         setInfoExpanded(false);
         setSelectedFeature(null);
@@ -297,33 +289,40 @@ function App() {
       if (e.sourceId === "district-tiles" && e.isSourceLoaded) {
         // Populate district dropdown data
         const senateFeatures = map.querySourceFeatures("district-tiles", {
-          sourceLayer: "senate"
+          sourceLayer: "senate",
         });
         const assemblyFeatures = map.querySourceFeatures("district-tiles", {
-          sourceLayer: "assembly"
+          sourceLayer: "assembly",
         });
 
         const senateDistricts = senateFeatures
           .map((f: any) => ({
             label: f.properties.senate_district_label,
-            representative: f.properties.representative
+            representative: f.properties.representative,
           }))
-          .filter((item: any, index: number, self: any[]) => 
-            item.label && self.findIndex(s => s.label === item.label) === index
+          .filter(
+            (item: any, index: number, self: any[]) =>
+              item.label &&
+              self.findIndex((s) => s.label === item.label) === index
           )
           .sort((a: any, b: any) => a.label.localeCompare(b.label));
 
         const assemblyDistricts = assemblyFeatures
           .map((f: any) => ({
             label: f.properties.assembly_district_label,
-            representative: f.properties.representative
+            representative: f.properties.representative,
           }))
-          .filter((item: any, index: number, self: any[]) => 
-            item.label && self.findIndex(s => s.label === item.label) === index
+          .filter(
+            (item: any, index: number, self: any[]) =>
+              item.label &&
+              self.findIndex((s) => s.label === item.label) === index
           )
           .sort((a: any, b: any) => a.label.localeCompare(b.label));
 
-        setDistrictData({ senate: senateDistricts, assembly: assemblyDistricts });
+        setDistrictData({
+          senate: senateDistricts,
+          assembly: assemblyDistricts,
+        });
 
         // senate layer
         if (!map.getLayer("senate-polygon")) {
@@ -333,15 +332,10 @@ function App() {
             source: "district-tiles",
             "source-layer": "senate",
             layout: { visibility: "visible" },
-             paint: {
-               "fill-color": "#3388ff",
-               "fill-opacity": [
-                 "case",
-                 ["get", "activity"],
-                 0.3,
-                 0.2
-               ],
-             },
+            paint: {
+              "fill-color": "#3388ff",
+              "fill-opacity": ["case", ["get", "activity"], 0.3, 0.2],
+            },
           });
         }
 
@@ -368,15 +362,10 @@ function App() {
             source: "district-tiles",
             "source-layer": "assembly",
             layout: { visibility: "none" },
-             paint: {
-               "fill-color": "#8462C0",
-               "fill-opacity": [
-                 "case",
-                 ["get", "activity"],
-                 0.3,
-                 0.2
-               ],
-             },
+            paint: {
+              "fill-color": "#8462C0",
+              "fill-opacity": ["case", ["get", "activity"], 0.3, 0.2],
+            },
           });
         }
 
@@ -471,7 +460,13 @@ function App() {
         }}
       >
         <select
-          value={selectedFeature ? (activeLayer === 'senate' ? selectedFeature.senate_district_label : selectedFeature.assembly_district_label) : ""}
+          value={
+            selectedFeature
+              ? activeLayer === "senate"
+                ? selectedFeature.senate_district_label
+                : selectedFeature.assembly_district_label
+              : ""
+          }
           onChange={(e) => selectDistrictFromDropdown(e.target.value)}
           style={{
             fontSize: "12px",
@@ -486,7 +481,10 @@ function App() {
           }}
         >
           <option value="">Select District</option>
-          {(activeLayer === 'senate' ? districtData.senate : districtData.assembly).map((district: any) => (
+          {(activeLayer === "senate"
+            ? districtData.senate
+            : districtData.assembly
+          ).map((district: any) => (
             <option key={district.label} value={district.label}>
               {district.label} - {district.representative}
             </option>
@@ -548,105 +546,164 @@ function App() {
             backdropFilter: "blur(10px)",
           }}
         >
-          <div style={{ 
-            padding: "12px 16px", 
-            fontSize: "12px",
-            background: selectedFeature.layer === 'senate' 
-              ? 'linear-gradient(135deg, #3587FF 0%, #4A9DFF 100%)' 
-              : 'linear-gradient(135deg, #8462C0 0%, #9B7DD4 100%)',
-            color: "white",
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h2 style={{ 
-                margin: 0, 
-                fontSize: "18px", 
-                fontWeight: "600",
-                color: "white",
-                textShadow: "0 1px 2px rgba(0,0,0,0.1)"
-              }}>
-                {selectedFeature.layer === 'senate' ? selectedFeature.senate_district_name : selectedFeature.assembly_district_name}
+          <div
+            style={{
+              padding: "12px 16px",
+              fontSize: "12px",
+              background:
+                selectedFeature.layer === "senate"
+                  ? "linear-gradient(135deg, #3587FF 0%, #4A9DFF 100%)"
+                  : "linear-gradient(135deg, #8462C0 0%, #9B7DD4 100%)",
+              color: "white",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "18px",
+                  fontWeight: "600",
+                  color: "white",
+                  textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                }}
+              >
+                {selectedFeature.layer === "senate"
+                  ? selectedFeature.senate_district_name
+                  : selectedFeature.assembly_district_name}
               </h2>
-              <h3 style={{ 
-                margin: 0, 
-                fontSize: "15px", 
-                fontWeight: "500",
-                color: "white",
-                textShadow: "0 1px 2px rgba(0,0,0,0.1)"
-              }}>{selectedFeature.representative}</h3>
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: "15px",
+                  fontWeight: "500",
+                  color: "white",
+                  textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                }}
+              >
+                {selectedFeature.representative}
+              </h3>
             </div>
           </div>
-          <div style={{ 
-            padding: "12px 12px", 
-            fontSize: "14px",
-            maxHeight: "82.5vh",
-            overflowY: "auto"
-          }}>
-            {selectedFeature.activity ? (() => {
-              const attributes = [];
-              const badgeGradient = selectedFeature.layer === 'senate' 
-                ? 'linear-gradient(135deg, #3587FF, #4A9DFF)'
-                : 'linear-gradient(135deg, #8462C0, #9B7DD4)';
-              
-              if (selectedFeature.county_resolution_names) {
-                attributes.push({
-                  label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${selectedFeature.county_resolutions_passed}</span>County Resolution${selectedFeature.county_resolutions_passed === 1 ? "" : "s"}`,
-                  content: selectedFeature.county_resolution_names.replaceAll(",", "<br />")
-                });
-              }
-              
-              if (selectedFeature.city_resolution_names) {
-                attributes.push({
-                  label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${selectedFeature.city_resolutions_passed}</span>City Resolution${selectedFeature.city_resolutions_passed === 1 ? "" : "s"}`,
-                  content: selectedFeature.city_resolution_names.replaceAll(",", "<br />")
-                });
-              }
-              
-              if (selectedFeature.letter_authors) {
-                attributes.push({
-                  label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${selectedFeature.number_of_letters}</span>Local Elected Sign-On${selectedFeature.number_of_letters === 1 ? "" : "s"}`,
-                  content: selectedFeature.letter_authors.replaceAll(",", "<br />")
-                });
-              }
-              
-              if (selectedFeature.walkouts) {
-                attributes.push({
-                  label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${selectedFeature.number_of_walkouts}</span>Student Walkout${selectedFeature.number_of_walkouts === 1 ? "" : "s"}`,
-                  content: selectedFeature.walkouts.replaceAll(",", "<br />")
-                });
-              }
+          <div
+            style={{
+              padding: "12px 12px",
+              fontSize: "14px",
+              maxHeight: "82.5vh",
+              overflowY: "auto",
+            }}
+          >
+            {selectedFeature.activity ? (
+              (() => {
+                const attributes = [];
+                const badgeGradient =
+                  selectedFeature.layer === "senate"
+                    ? "linear-gradient(135deg, #3587FF, #4A9DFF)"
+                    : "linear-gradient(135deg, #8462C0, #9B7DD4)";
 
-              return attributes.map((attr, index) => {
-                const bgColor = index % 2 === 0 ? "rgba(248, 249, 250, 0.6)" : "rgba(255, 255, 255, 0.8)";
-                return (
-                  <div 
-                    key={index}
-                    style={{
-                      margin: 0,
-                      padding: "8px 10px",
-                      backgroundColor: bgColor,
-                      borderRadius: "8px",
-                      marginBottom: "6px",
-                      border: "1px solid rgba(0,0,0,0.05)",
-                      transition: "all 0.2s ease",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
-                    }}
-                    dangerouslySetInnerHTML={{
-                      __html: `<strong style="color: #444; font-weight: 600;">${attr.label}</strong><ul style="margin: 4px 0 0 0; padding-left: 20px;"><li style="color: #666; line-height: 1.5;">${attr.content.replaceAll("<br />", "</li><li style='color: #666; line-height: 1.5;'>")}</li></ul>`
-                    }}
-                  />
-                );
-              });
-            })() : (
-              <div style={{
-                margin: 0,
-                padding: "8px 10px",
-                backgroundColor: "rgba(248, 249, 250, 0.6)",
-                borderRadius: "8px",
-                border: "1px solid rgba(0,0,0,0.05)",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                textAlign: "center"
-              }}>
-                <i style={{ color: "#999", fontSize: "13px" }}>No activity reported yet</i>
+                if (selectedFeature.county_resolution_names) {
+                  attributes.push({
+                    label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${
+                      selectedFeature.county_resolutions_passed
+                    }</span>County Resolution${
+                      selectedFeature.county_resolutions_passed === 1 ? "" : "s"
+                    }`,
+                    content: selectedFeature.county_resolution_names.replaceAll(
+                      ",",
+                      "<br />"
+                    ),
+                  });
+                }
+
+                if (selectedFeature.city_resolution_names) {
+                  attributes.push({
+                    label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${
+                      selectedFeature.city_resolutions_passed
+                    }</span>City Resolution${
+                      selectedFeature.city_resolutions_passed === 1 ? "" : "s"
+                    }`,
+                    content: selectedFeature.city_resolution_names.replaceAll(
+                      ",",
+                      "<br />"
+                    ),
+                  });
+                }
+
+                if (selectedFeature.letter_authors) {
+                  attributes.push({
+                    label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${
+                      selectedFeature.number_of_letters
+                    }</span>Local Elected Sign-On${
+                      selectedFeature.number_of_letters === 1 ? "" : "s"
+                    }`,
+                    content: selectedFeature.letter_authors.replaceAll(
+                      ",",
+                      "<br />"
+                    ),
+                  });
+                }
+
+                if (selectedFeature.walkouts) {
+                  attributes.push({
+                    label: `<span style="background: ${badgeGradient}; color: white; padding: 2px 8px; border-radius: 12px; font-weight: 700; margin-right: 6px;">${
+                      selectedFeature.number_of_walkouts
+                    }</span>Student Walkout${
+                      selectedFeature.number_of_walkouts === 1 ? "" : "s"
+                    }`,
+                    content: selectedFeature.walkouts.replaceAll(",", "<br />"),
+                  });
+                }
+
+                return attributes.map((attr, index) => {
+                  const bgColor =
+                    index % 2 === 0
+                      ? "rgba(248, 249, 250, 0.6)"
+                      : "rgba(255, 255, 255, 0.8)";
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        margin: 0,
+                        padding: "8px 10px",
+                        backgroundColor: bgColor,
+                        borderRadius: "8px",
+                        marginBottom: "6px",
+                        border: "1px solid rgba(0,0,0,0.05)",
+                        transition: "all 0.2s ease",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                      }}
+                      dangerouslySetInnerHTML={{
+                        __html: `<strong style="color: #444; font-weight: 600;">${
+                          attr.label
+                        }</strong><ul style="margin: 4px 0 0 0; padding-left: 20px;"><li style="color: #666; line-height: 1.5;">${attr.content.replaceAll(
+                          "<br />",
+                          "</li><li style='color: #666; line-height: 1.5;'>"
+                        )}</li></ul>`,
+                      }}
+                    />
+                  );
+                });
+              })()
+            ) : (
+              <div
+                style={{
+                  margin: 0,
+                  padding: "8px 10px",
+                  backgroundColor: "rgba(248, 249, 250, 0.6)",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(0,0,0,0.05)",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                  textAlign: "center",
+                }}
+              >
+                <i style={{ color: "#999", fontSize: "13px" }}>
+                  No activity reported yet
+                </i>
               </div>
             )}
           </div>
@@ -671,11 +728,13 @@ function App() {
       >
         {infoExpanded ? (
           <div>
-            <div style={{ 
-              padding: "9px 16px", 
-              background: 'linear-gradient(135deg, #3587FF 0%, #4A9DFF 100%)', 
-              color: "white",
-            }}>
+            <div
+              style={{
+                padding: "9px 16px",
+                background: "linear-gradient(135deg, #3587FF 0%, #4A9DFF 100%)",
+                color: "white",
+              }}
+            >
               <div
                 style={{
                   display: "flex",
@@ -683,13 +742,17 @@ function App() {
                   alignItems: "center",
                 }}
               >
-                <h3 style={{ 
-                  margin: 0, 
-                  fontSize: "18px",
-                  fontWeight: "600",
-                  color: "white",
-                  textShadow: "0 1px 2px rgba(0,0,0,0.1)"
-                }}>Welcome!</h3>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: "18px",
+                    fontWeight: "600",
+                    color: "white",
+                    textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  Welcome!
+                </h3>
                 <button
                   onClick={() => setInfoExpanded(false)}
                   style={{
@@ -706,39 +769,71 @@ function App() {
                 </button>
               </div>
             </div>
-            <div style={{ padding: "12px 16px", fontSize: "14px", lineHeight: "1.6", minWidth: "300px" }}>
+            <div
+              style={{
+                padding: "12px 16px",
+                fontSize: "14px",
+                lineHeight: "1.6",
+                minWidth: "300px",
+              }}
+            >
               <p style={{ margin: "0 0 12px 0", color: "#555" }}>
-                This map shows California legislative districts with information about support for<br /> the{" "}
-                <a 
-                  href="https://www.makepolluterspayca.com/" 
+                This map shows California legislative districts with information
+                about support for
+                <br /> the{" "}
+                <a
+                  href="https://www.makepolluterspayca.com/"
                   target="_blank"
-                  style={{ 
-                    color: "#3587FF", 
+                  style={{
+                    color: "#3587FF",
                     textDecoration: "none",
-                    fontWeight: "600"
+                    fontWeight: "600",
                   }}
                 >
                   Polluters Pay Climate Superfund Act of 2025
-                </a> in each of those areas.
+                </a>{" "}
+                in each of those areas.
               </p>
-              <div style={{ 
-                padding: "10px 12px",
-                backgroundColor: "rgba(248, 249, 250, 0.6)",
-                borderRadius: "8px",
-                border: "1px solid rgba(0,0,0,0.05)"
-              }}>
-                <strong style={{ color: "#333", fontSize: "13px" }}>How to use the map:</strong>
-                <ul style={{ margin: "6px 0 0 0", paddingLeft: "20px", color: "#666" }}>
+              <div
+                style={{
+                  padding: "10px 12px",
+                  backgroundColor: "rgba(248, 249, 250, 0.6)",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(0,0,0,0.05)",
+                }}
+              >
+                <strong style={{ color: "#333", fontSize: "13px" }}>
+                  How to use the map:
+                </strong>
+                <ul
+                  style={{
+                    margin: "6px 0 0 0",
+                    paddingLeft: "20px",
+                    color: "#666",
+                  }}
+                >
                   <li style={{ marginBottom: "4px" }}>
-                    Click on a district in the map or use the dropdown to view detailed information
+                    Click on a district in the map or use the dropdown to view
+                    detailed information
                   </li>
                   <li style={{ marginBottom: "4px" }}>
-                    Use the buttons in the top left to toggle between Senate and Assembly districts
+                    Use the buttons in the top left to toggle between Senate and
+                    Assembly districts
                   </li>
                   <li>
                     Darker shaded areas indicate activity in that district
                   </li>
                 </ul>
+              </div>
+              <div
+                style={{
+                  marginTop: "12px",
+                  color: "#666",
+                  fontSize: "12px",
+                  fontStyle: "italic",
+                }}
+              >
+                Note: this map may not be comprehensive of all activity in the state
               </div>
             </div>
           </div>
@@ -757,8 +852,10 @@ function App() {
               transition: "all 0.2s ease",
             }}
             title="Show Information"
-            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.transform = "scale(1.05)")
+            }
+            onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
             <FontAwesomeIcon icon={faInfo} style={{ fontSize: "18px" }} />
           </button>
