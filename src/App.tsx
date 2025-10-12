@@ -304,14 +304,24 @@ function App() {
         });
 
         const senateDistricts = senateFeatures
-          .map((f: any) => f.properties.senate_district_label)
-          .filter((label: string, index: number, self: string[]) => label && self.indexOf(label) === index)
-          .sort();
+          .map((f: any) => ({
+            label: f.properties.senate_district_label,
+            representative: f.properties.representative
+          }))
+          .filter((item: any, index: number, self: any[]) => 
+            item.label && self.findIndex(s => s.label === item.label) === index
+          )
+          .sort((a: any, b: any) => a.label.localeCompare(b.label));
 
         const assemblyDistricts = assemblyFeatures
-          .map((f: any) => f.properties.assembly_district_label)
-          .filter((label: string, index: number, self: string[]) => label && self.indexOf(label) === index)
-          .sort();
+          .map((f: any) => ({
+            label: f.properties.assembly_district_label,
+            representative: f.properties.representative
+          }))
+          .filter((item: any, index: number, self: any[]) => 
+            item.label && self.findIndex(s => s.label === item.label) === index
+          )
+          .sort((a: any, b: any) => a.label.localeCompare(b.label));
 
         setDistrictData({ senate: senateDistricts, assembly: assemblyDistricts });
 
@@ -472,13 +482,13 @@ function App() {
             background: "white",
             color: "black",
             cursor: "pointer",
-            minWidth: "150px",
+            width: "150px",
           }}
         >
           <option value="">Select District</option>
-          {(activeLayer === 'senate' ? districtData.senate : districtData.assembly).map((district: string) => (
-            <option key={district} value={district}>
-              {district}
+          {(activeLayer === 'senate' ? districtData.senate : districtData.assembly).map((district: any) => (
+            <option key={district.label} value={district.label}>
+              {district.label} - {district.representative}
             </option>
           ))}
         </select>
@@ -556,6 +566,13 @@ function App() {
               }}>
                 {selectedFeature.layer === 'senate' ? selectedFeature.senate_district_name : selectedFeature.assembly_district_name}
               </h2>
+              <h3 style={{ 
+                margin: 0, 
+                fontSize: "15px", 
+                fontWeight: "500",
+                color: "white",
+                textShadow: "0 1px 2px rgba(0,0,0,0.1)"
+              }}>{selectedFeature.representative}</h3>
             </div>
           </div>
           <div style={{ 
