@@ -18,11 +18,35 @@ function App() {
     senate: [],
     assembly: [],
   });
+  const [fileMetadata, setFileMetadata] = useState<any>(null);
 
   useEffect(() => {
     // Register the PMTiles protocol once when component mounts
     let protocol = new Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
+
+    // Fetch file metadata
+    const fetchFileMetadata = async () => {
+      try {
+        const response = await fetch('https://pub-ab0c00b2b5024563855a23efd20fe62b.r2.dev/districts.pmtiles', {
+          method: 'HEAD'
+        });
+        
+        const lastModified = response.headers.get('Last-Modified');
+        const contentLength = response.headers.get('Content-Length');
+        const etag = response.headers.get('ETag');
+        
+        setFileMetadata({
+          lastModified: lastModified ? new Date(lastModified) : null,
+          contentLength: contentLength ? parseInt(contentLength) : null,
+          etag: etag
+        });
+      } catch (error) {
+        console.error('Error fetching file metadata:', error);
+      }
+    };
+
+    fetchFileMetadata();
 
     // Cleanup on unmount
     return () => {
@@ -828,6 +852,7 @@ function App() {
               <div
                 style={{
                   marginTop: "12px",
+                  marginBottom: "12px",
                   color: "#666",
                   fontSize: "12px",
                   fontStyle: "italic",
@@ -835,6 +860,19 @@ function App() {
               >
                 Note: this map may not be comprehensive of all activity in the state
               </div>
+              {fileMetadata && fileMetadata.lastModified && (
+                <div style={{ 
+                  padding: "7px 12px",
+                  backgroundColor: "rgba(53, 135, 255, 0.1)",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(53, 135, 255, 0.2)",
+                  marginTop: "8px",
+                  fontSize: "12px",
+                  color: "#555"
+                }}>
+                  <strong style={{ color: "#3587FF" }}>Data last updated:</strong> {fileMetadata.lastModified.toLocaleDateString()} at {fileMetadata.lastModified.toLocaleTimeString()}
+                </div>
+              )}
             </div>
           </div>
         ) : (
