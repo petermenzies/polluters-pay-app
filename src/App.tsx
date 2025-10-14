@@ -501,7 +501,7 @@ function App() {
             background: "white",
             color: "black",
             cursor: "pointer",
-            width: "150px",
+            width: "207px",
           }}
         >
           <option value="">Select District</option>
